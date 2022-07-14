@@ -16,11 +16,19 @@
 <script>
 export default {
   name: "Contador123",
-  props: [
-    //primera forma, infiere el tipo de dato
-    "titulo",
-    "inicio"
-  ],
+  props: {
+    //segunda forma, declarar implicitamente el tipo de dato
+    titulo: String,
+    inicio: {
+      type: Number,
+      required: false,
+      default: 100,
+      validator(value){
+        //validacion que retorne un true o false
+        return value > 0
+      }
+    }
+  },
   data() {
     return {
       numero: this.inicio,
