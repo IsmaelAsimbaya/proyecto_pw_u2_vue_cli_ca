@@ -1,11 +1,14 @@
 <template>
-  <img src="https://via.placeholder.com/250" alt="no encontrado" />
+  <img v-if="imagen" v-bind:src="imagen" alt="no encontrado" />
   <div class="bg-oscuro"></div>
   <div class="pregunta-container">
     <input v-model="pregunta" type="text" placeholder="Preguuuntamee..." />
     <p>Recuerda terminar con un signo de pregunta (?)</p>
-    <h2>{{ pregunta }}</h2>
-    <h1>Si, No, ...Pensando</h1>
+
+    <div v-if="preguntaValida">
+      <h2>{{ pregunta }}</h2>
+      <h1>{{ respuesta }}</h1>
+    </div>
   </div>
 </template>
 
@@ -15,17 +18,44 @@ export default {
   data() {
     return {
       pregunta: "Seré millonario ?",
+      respuesta: null,
+      imagen: null,
+      preguntaValida: false,
     };
   },
   methods: {
     //cuando se llama al API se debe tenr una palabra reservada al inicio
     async obtenerRespuesta() {
-      const data = await fetch('https://yesno.wtf/api').then(
-        (r) => r.json()
+      this.respuesta = "Pensando.";
+      this.respuesta = "Pensando..";
+      const { answer, image } = await fetch("https://yesno.wtf/api").then((r) =>
+        r.json()
       );
-      console.log('Respuesta');
-      console.log(data);
+      this.respuesta = "Pensando...";
+
+      console.log("Respuesta");
+      console.log(answer);
+      console.log(image);
+      this.respuesta = answer;
+      this.imagen = image;
     },
+    async consultaCovid() {
+      const data = await fetch(
+        "https://api.covidtracking.com/v1/us/current.json"
+      ).then((r) => r.json());
+      const { negative } = data[0];
+      console.log(negative);
+    },
+    async animeGif() {
+      const { url } = await fetch(
+        "https://api.satou-chan.xyz/api/endpoint/happy"
+      ).then((r) => r.json());
+      console.log(url);
+      this.imagen = url;
+    },
+
+
+
   },
   watch: {
     //permite observar los cambios
@@ -35,10 +65,12 @@ export default {
       console.log(valor.includes("?"));
 
       if (!valor.includes("?")) return;
-
+      this.preguntaValida = true;
       console.log("Si Incluye");
       //Llamar y consultar al API
-      this.obtenerRespuesta()
+      this.obtenerRespuesta();
+      this.consultaCovid();
+      this.animeGif();
     },
   },
 };
